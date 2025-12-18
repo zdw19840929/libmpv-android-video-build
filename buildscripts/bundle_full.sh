@@ -38,23 +38,23 @@ cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         
 cd ../..
 
 pushd prefix/arm64-v8a/usr/local/lib
-zip -r ../../../../../full-arm64-v8a.jar *.so
+zip -r "$ROOT_DIR/full-arm64-v8a.jar" *.so
 popd
 
 pushd prefix/armeabi-v7a/usr/local/lib
-zip -r ../../../../../full-armeabi-v7a.jar *.so
+zip -r "$ROOT_DIR/full-armeabi-v7a.jar" *.so
 popd
 
 pushd prefix/x86/usr/local/lib
-zip -r ../../../../../full-x86.jar *.so
+zip -r "$ROOT_DIR/full-x86.jar" *.so
 popd
 
 pushd prefix/x86_64/usr/local/lib
-zip -r ../../../../../full-x86_64.jar *.so
+zip -r "$ROOT_DIR/full-x86_64.jar" *.so
 popd
 
 echo "===== Generated jars ====="
-ls -lh full-*.jar
+ls -lh "$ROOT_DIR"/full-*.jar
 
 echo "===== MD5 ====="
-md5sum full-*.jar
+md5sum "$ROOT_DIR"/full-*.jar
