@@ -37,10 +37,6 @@ cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         
 
 cd ../..
 
-# --------------------------------------------------
-# Package .so into jar (FLAT structure, NO prefix path)
-# --------------------------------------------------
-
 pushd prefix/arm64-v8a/usr/local/lib
 zip -r ../../../../../full-arm64-v8a.jar *.so
 popd
@@ -57,4 +53,8 @@ pushd prefix/x86_64/usr/local/lib
 zip -r ../../../../../full-x86_64.jar *.so
 popd
 
-# md5sum *.jar
+echo "===== Generated jars ====="
+ls -lh full-*.jar
+
+echo "===== MD5 ====="
+md5sum full-*.jar
