@@ -57,4 +57,4 @@ pushd prefix/x86_64/usr/local/lib
 zip -r ../../../../../full-x86_64.jar *.so
 popd
 
-md5sum *.jar
+# md5sum *.jar
