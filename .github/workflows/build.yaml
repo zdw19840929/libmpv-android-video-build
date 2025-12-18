@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-  
+
 permissions:
   contents: write
 
@@ -14,49 +14,57 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v1
         with:
           channel: "stable"
+
       - name: Symlink SDK
         working-directory: ./buildscripts
         run: |
           mkdir sdk
           ln -s ${ANDROID_HOME} ./sdk/android-sdk-linux
-      #- name: Bundle (default)
-      #  working-directory: ./buildscripts
-      #  run: |
-      #    sudo chmod +x bundle_default.sh
-      #    ./bundle_default.sh
+
       - name: Bundle (full)
         working-directory: ./buildscripts
         run: |
-          sudo chmod +x bundle_full.sh
+          chmod +x bundle_full.sh
           ./bundle_full.sh
-      #- name: Bundle (encoders-gpl)
-      #  working-directory: ./buildscripts
-      #  run: |
-      #    sudo chmod +x bundle_encoders-gpl.sh
-      #    ./bundle_encoders-gpl.sh
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifact
-          path: ./buildscripts/*.jar
-      - uses: softprops/action-gh-release@v1
+
+      # ⭐ 关键：创建 tag
+      - name: Create tag
         if: github.ref == 'refs/heads/main'
+        run: |
+          git tag vnext || true
+          git push origin vnext || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          draft: true
+          name: jars
+          path: buildscripts/*.jar
+
+      # ⭐ 发布到 Release
+      - name: Publish Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: vnext
+          draft: false
           prerelease: false
-          tag_name: "vnext"
           files: |
             buildscripts/*.jar
