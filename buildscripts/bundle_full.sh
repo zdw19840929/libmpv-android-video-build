@@ -42,6 +42,14 @@ cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         
 popd
 
 # --------------------------------------------------
+# prepare output dirs
+# --------------------------------------------------
+mkdir -p "$ROOT_DIR/lib/arm64-v8a"
+mkdir -p "$ROOT_DIR/lib/armeabi-v7a"
+mkdir -p "$ROOT_DIR/lib/x86"
+mkdir -p "$ROOT_DIR/lib/x86_64"
+
+# --------------------------------------------------
 # package jars (FLAT)
 # --------------------------------------------------
 pushd "$SCRIPT_DIR/prefix/arm64-v8a/usr/local/lib"
@@ -64,7 +72,7 @@ popd
 # verify
 # --------------------------------------------------
 echo "===== Generated jars ====="
-ls -lh "$ROOT_DIR"/full-*.jar
+ls -lh "$ROOT_DIR/lib"/*/full-*.jar
 
 echo "===== MD5 ====="
-md5sum "$ROOT_DIR"/full-*.jar
+md5sum "$ROOT_DIR/lib"/*/full-*.jar
