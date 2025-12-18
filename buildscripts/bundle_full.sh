@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
-# ===== resolve paths =====
+# ==================================================
+# resolve paths
+# ==================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "SCRIPT_DIR=$SCRIPT_DIR"
 echo "ROOT_DIR=$ROOT_DIR"
 
-# --------------------------------------------------
+# ==================================================
 # clean
-# --------------------------------------------------
+# ==================================================
 rm -rf deps prefix
 
-# --------------------------------------------------
+# ==================================================
 # build mpv
-# --------------------------------------------------
+# ==================================================
 ./download.sh
 ./patch.sh
 
@@ -24,55 +26,67 @@ cp flavors/full.sh scripts/ffmpeg.sh
 
 ./build.sh
 
-# --------------------------------------------------
-# build media-kit helper
-# --------------------------------------------------
+# ==================================================
+# build media-kit android helper
+# ==================================================
 pushd deps/media-kit-android-helper
 
 chmod +x gradlew
 ./gradlew assembleRelease
 
-unzip -o app/build/outputs/apk/release/app-release.apk -d app/build/outputs/apk/release
+unzip -o app/build/outputs/apk/release/app-release.apk \
+      -d app/build/outputs/apk/release
 
-cp app/build/outputs/apk/release/lib/arm64-v8a/libmediakitandroidhelper.so      "$SCRIPT_DIR/prefix/arm64-v8a/usr/local/lib"
-cp app/build/outputs/apk/release/lib/armeabi-v7a/libmediakitandroidhelper.so    "$SCRIPT_DIR/prefix/armeabi-v7a/usr/local/lib"
-cp app/build/outputs/apk/release/lib/x86/libmediakitandroidhelper.so            "$SCRIPT_DIR/prefix/x86/usr/local/lib"
-cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so         "$SCRIPT_DIR/prefix/x86_64/usr/local/lib"
+cp app/build/outputs/apk/release/lib/arm64-v8a/libmediakitandroidhelper.so \
+   "$SCRIPT_DIR/prefix/arm64-v8a/usr/local/lib"
+
+cp app/build/outputs/apk/release/lib/armeabi-v7a/libmediakitandroidhelper.so \
+   "$SCRIPT_DIR/prefix/armeabi-v7a/usr/local/lib"
+
+cp app/build/outputs/apk/release/lib/x86/libmediakitandroidhelper.so \
+   "$SCRIPT_DIR/prefix/x86/usr/local/lib"
+
+cp app/build/outputs/apk/release/lib/x86_64/libmediakitandroidhelper.so \
+   "$SCRIPT_DIR/prefix/x86_64/usr/local/lib"
 
 popd
 
-# --------------------------------------------------
-# prepare output dirs
-# --------------------------------------------------
-mkdir -p "$ROOT_DIR/lib/arm64-v8a"
-mkdir -p "$ROOT_DIR/lib/armeabi-v7a"
-mkdir -p "$ROOT_DIR/lib/x86"
-mkdir -p "$ROOT_DIR/lib/x86_64"
+# ==================================================
+# package jars (ANDROID JNI STRUCTURE)
+# ==================================================
 
-# --------------------------------------------------
-# package jars (FLAT)
-# --------------------------------------------------
-pushd "$SCRIPT_DIR/prefix/arm64-v8a/usr/local/lib"
-zip -r "$ROOT_DIR/lib/arm64-v8a/full-arm64-v8a.jar" *.so
-popd
+package_jar() {
+  ABI="$1"
+  OUT_JAR="$ROOT_DIR/full-$ABI.jar"
 
-pushd "$SCRIPT_DIR/prefix/armeabi-v7a/usr/local/lib"
-zip -r "$ROOT_DIR/lib/armeabi-v7a/full-armeabi-v7a.jar" *.so
-popd
+  echo "📦 Packaging $OUT_JAR"
 
-pushd "$SCRIPT_DIR/prefix/x86/usr/local/lib"
-zip -r "$ROOT_DIR/lib/x86/full-x86.jar" *.so
-popd
+  rm -rf jar_root
+  mkdir -p jar_root/lib/$ABI
 
-pushd "$SCRIPT_DIR/prefix/x86_64/usr/local/lib"
-zip -r "$ROOT_DIR/lib/x86_64/full-x86_64.jar" *.so
-popd
+  cp "$SCRIPT_DIR/prefix/$ABI/usr/local/lib/"*.so \
+     jar_root/lib/$ABI/
 
-# --------------------------------------------------
+  pushd jar_root
+  jar cf "$OUT_JAR" .
+  popd
+
+  rm -rf jar_root
+}
+
+package_jar arm64-v8a
+package_jar armeabi-v7a
+package_jar x86
+package_jar x86_64
+
+# ==================================================
 # verify
-# --------------------------------------------------
+# ==================================================
 echo "===== Generated jars ====="
-ls -lh "$ROOT_DIR/lib"/*/full-*.jar
+ls -lh "$ROOT_DIR"/full-*.jar
+
+echo "===== Jar contents check ====="
+jar tf "$ROOT_DIR/full-arm64-v8a.jar"
 
 echo "===== MD5 ====="
-md5sum "$ROOT_DIR/lib"/*/full-*.jar
+md5sum "$ROOT_DIR"/full-*.jar
