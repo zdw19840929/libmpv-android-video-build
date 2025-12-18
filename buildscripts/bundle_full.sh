@@ -45,19 +45,19 @@ popd
 # package jars (FLAT)
 # --------------------------------------------------
 pushd "$SCRIPT_DIR/prefix/arm64-v8a/usr/local/lib"
-zip -r "$ROOT_DIR/full-arm64-v8a.jar" *.so
+zip -r "$ROOT_DIR/lib/arm64-v8a/full-arm64-v8a.jar" *.so
 popd
 
 pushd "$SCRIPT_DIR/prefix/armeabi-v7a/usr/local/lib"
-zip -r "$ROOT_DIR/full-armeabi-v7a.jar" *.so
+zip -r "$ROOT_DIR/lib/armeabi-v7a/full-armeabi-v7a.jar" *.so
 popd
 
 pushd "$SCRIPT_DIR/prefix/x86/usr/local/lib"
-zip -r "$ROOT_DIR/full-x86.jar" *.so
+zip -r "$ROOT_DIR/lib/x86/full-x86.jar" *.so
 popd
 
 pushd "$SCRIPT_DIR/prefix/x86_64/usr/local/lib"
-zip -r "$ROOT_DIR/full-x86_64.jar" *.so
+zip -r "$ROOT_DIR/lib/x86_64/full-x86_64.jar" *.so
 popd
 
 # --------------------------------------------------
