@@ -45,20 +45,21 @@ jobs:
           chmod +x bundle_full.sh
           ./bundle_full.sh
 
-      # ⭐ 关键：创建 tag
+      # ⭐ 创建 tag（只在 main）
       - name: Create tag
         if: github.ref == 'refs/heads/main'
         run: |
-          git tag vnext || true
-          git push origin vnext || true
+          git tag -f vnext
+          git push origin vnext --force
 
+      # ⭐ 上传 CI 构建产物
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: jars
-          path: buildscripts/*.jar
+          name: libmpv-jars
+          path: "*.jar"
 
-      # ⭐ 发布到 Release
+      # ⭐ 发布到 GitHub Release
       - name: Publish Release
         if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v1
@@ -67,4 +68,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            buildscripts/*.jar
+            *.jar
