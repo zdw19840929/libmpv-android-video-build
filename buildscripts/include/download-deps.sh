@@ -57,7 +57,7 @@ if [ ! -d lua ]; then
 fi
 
 # libplacebo
-[ ! -d libplacebo ] && git clone --depth 1 --branch master --recurse-submodules https://github.com/haasn/libplacebo.git libplacebo
+[ ! -d libplacebo ] && git clone --depth 1 --branch v$v_libplacebo --recurse-submodules https://github.com/haasn/libplacebo.git libplacebo
 
 # mpv
 [ ! -d mpv ]  && git clone --depth 1 --branch v$v_mpv https://github.com/mpv-player/mpv.git mpv
